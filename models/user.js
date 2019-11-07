@@ -7,7 +7,6 @@ module.exports = (sequelize) => {
         firstName: {
             type: Sequelize.STRING,
             validate: {
-                len: [2, 5],
                 notEmpty: {
                     msg: '"firstName" is required'
                 }
@@ -25,10 +24,10 @@ module.exports = (sequelize) => {
         emailAddress: {
             type: Sequelize.STRING,
             validate: {
-
                 notEmpty: {
                     msg: '"email" is required'
-                }
+                },
+                isEmail: true,
             }
         },
         password: {

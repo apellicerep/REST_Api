@@ -1,7 +1,11 @@
 const express = require('express')
 const router = express.Router()
-const auth = require('basic-auth');
+const bcryptjs = require('bcryptjs');
 const User = require('../../models').User
+const auth = require('basic-auth')
+const authHandler = require('../.././auth.js').authenticateUser
+
+
 
 /* Handler function to wrap each route. */
 function asyncHandler(cb) {
@@ -14,27 +18,31 @@ function asyncHandler(cb) {
     }
 }
 
-router.get('/', asyncHandler((req, res) => {
-    const credentials = auth(req);
+router.get('/', authHandler, asyncHandler(async (req, res, next) => {
+    const user = req.currentUser;
     res.json({
-        credenciales: credentials
+        name: user.firstName,
+        email: emailAddress
     })
-
 }))
+
 
 router.post('/', asyncHandler(async (req, res, next) => {
     let user;
+    console.log(req.body)
     try {
+        const { password } = req.body
+        if (!(password === 'null' || password === "")) {
+            req.body.password = bcryptjs.hashSync(password)
+        }
         user = await User.create(req.body);
         res.status(201).redirect("/")
     } catch (error) {
         if (error.name === "SequelizeValidationError") {
-            user = await User.build(req.body);
             error.status = 400
             next(error)
-
         } else {
-            //console.log(error)
+            console.log(error)
             throw error;
         }
     }
