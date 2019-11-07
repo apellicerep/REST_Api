@@ -3,6 +3,8 @@
 // load modules
 const express = require('express');
 const morgan = require('morgan');
+var sequelize = require('./models').sequelize;
+
 
 
 // variable to enable global error logging
@@ -12,10 +14,23 @@ const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'tr
 
 const app = express();
 
+//routes
+
+var indexRouter = require('./routes/index');
+var usersRouter = require('./routes/api/users');
+var coursesRouter = require('./routes/api/courses');
+
 
 
 // setup morgan which gives us http request logging
 app.use(morgan('dev'));
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
+app.use('/', indexRouter)
+app.use('/api/users', usersRouter)
+app.use('/api/courses', coursesRouter)
 
 
 // send 404 if no other route matched
@@ -42,10 +57,11 @@ app.set('port', process.env.PORT || 5000);
 
 
 
+
 // start listening on our port
-
-app.listen(app.get('port'), () => {
-  console.log(`Express server is listening on port 5000`);
+sequelize.sync().then(() => {
+  app.listen(app.get('port'), () => {
+    console.log(`Express server is listening on port 5000`);
+  })
 });
-
 
