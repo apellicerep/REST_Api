@@ -38,10 +38,10 @@ class Database {
         VALUES
           (?, ?, ?, ?, datetime('now'), datetime('now'));
       `,
-      user.firstName,
-      user.lastName,
-      user.emailAddress,
-      user.password);
+        user.firstName,
+        user.lastName,
+        user.emailAddress,
+        user.password);
   }
 
   createCourse(course) {
@@ -52,11 +52,11 @@ class Database {
         VALUES
           (?, ?, ?, ?, ?, datetime('now'), datetime('now'));
       `,
-      course.userId,
-      course.title,
-      course.description,
-      course.estimatedTime,
-      course.materialsNeeded);
+        course.userId,
+        course.title,
+        course.description,
+        course.estimatedTime,
+        course.materialsNeeded);
   }
 
   async hashUserPasswords(users) {
@@ -98,10 +98,10 @@ class Database {
     await this.context.execute(`
       CREATE TABLE Users (
         id INTEGER PRIMARY KEY AUTOINCREMENT, 
-        firstName VARCHAR(255) NOT NULL DEFAULT '', 
-        lastName VARCHAR(255) NOT NULL DEFAULT '', 
-        emailAddress VARCHAR(255) NOT NULL DEFAULT '' UNIQUE, 
-        password VARCHAR(255) NOT NULL DEFAULT '', 
+        firstName VARCHAR(255) NOT NULL, 
+        lastName VARCHAR(255) NOT NULL, 
+        emailAddress VARCHAR(255) NOT NULL UNIQUE, 
+        password VARCHAR(255) NOT NULL, 
         createdAt DATETIME NOT NULL, 
         updatedAt DATETIME NOT NULL
       );
@@ -130,13 +130,13 @@ class Database {
     await this.context.execute(`
       CREATE TABLE Courses (
         id INTEGER PRIMARY KEY AUTOINCREMENT, 
-        title VARCHAR(255) NOT NULL DEFAULT '', 
-        description TEXT NOT NULL DEFAULT '', 
+        title VARCHAR(255) NOT NULL , 
+        description TEXT NOT NULL , 
         estimatedTime VARCHAR(255), 
         materialsNeeded VARCHAR(255), 
         createdAt DATETIME NOT NULL, 
         updatedAt DATETIME NOT NULL, 
-        userId INTEGER NOT NULL DEFAULT -1 
+        userId INTEGER NOT NULL 
           REFERENCES Users (id) ON DELETE CASCADE ON UPDATE CASCADE
       );
     `);

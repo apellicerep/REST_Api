@@ -8,8 +8,8 @@ function asyncHandler(cb) {
     return async (req, res, next) => {
         try {
             await cb(req, res, next)
-        } catch (error) {
-            res.status(500).end()
+        } catch (err) {
+            next(err)
         }
     }
 }
@@ -22,20 +22,19 @@ router.get('/', asyncHandler((req, res) => {
 
 }))
 
-router.post('/', asyncHandler(async (req, res) => {
+router.post('/', asyncHandler(async (req, res, next) => {
     let user;
-    console.log(req.body)
-
     try {
         user = await User.create(req.body);
         res.status(201).redirect("/")
     } catch (error) {
         if (error.name === "SequelizeValidationError") {
             user = await User.build(req.body);
-            console.log(error.errors)
-            res.status(500).end()
+            error.status = 400
+            next(error)
+
         } else {
-            console.log(error)
+            //console.log(error)
             throw error;
         }
     }

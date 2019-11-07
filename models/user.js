@@ -4,16 +4,12 @@ module.exports = (sequelize) => {
     class User extends Sequelize.Model { }
 
     User.init({
-        id: {
-            type: Sequelize.INTEGER,
-            primaryKey: true,
-            autoIncrement: true,
-        },
         firstName: {
             type: Sequelize.STRING,
             validate: {
+                len: [2, 5],
                 notEmpty: {
-                    msg: '"title" is required'
+                    msg: '"firstName" is required'
                 }
             }
         },
@@ -21,7 +17,7 @@ module.exports = (sequelize) => {
             type: Sequelize.STRING,
             validate: {
                 notEmpty: {
-                    msg: '"title" is required'
+                    msg: '"lastName" is required'
                 }
             }
 
@@ -29,8 +25,9 @@ module.exports = (sequelize) => {
         emailAddress: {
             type: Sequelize.STRING,
             validate: {
+
                 notEmpty: {
-                    msg: '"title" is required'
+                    msg: '"email" is required'
                 }
             }
         },
@@ -38,7 +35,7 @@ module.exports = (sequelize) => {
             type: Sequelize.STRING,
             validate: {
                 notEmpty: {
-                    msg: '"title" is required'
+                    msg: '"password" is required'
                 }
             }
         }
