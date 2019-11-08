@@ -2,7 +2,6 @@ const express = require('express')
 const router = express.Router()
 const bcryptjs = require('bcryptjs');
 const User = require('../../models').User
-const auth = require('basic-auth')
 const authHandler = require('../.././auth.js').authenticateUser
 
 
