@@ -17,9 +17,13 @@ function asyncHandler(cb) {
 //get all courses
 router.get('/', asyncHandler(async (req, res) => {
     const courses = await Course.findAll({
+        attributes: { exclude: ['createdAt', 'updatedAt'] },
         include: [
             {
                 model: User,
+                attributes: {
+                    exclude: ['password', 'createdAt', 'updatedAt']
+                }
             }
         ]
     })
@@ -76,15 +80,15 @@ router.put('/:id', authHandler, asyncHandler(async (req, res) => {
     let course;
     try {
         course = await Course.findByPk(req.params.id)//busco instancia del curso
-        if (course.userId === req.currentUser.id) {
-            if (course) {
+        if (course) {
+            if (course.userId === req.currentUser.id) {
                 await course.update(req.body) //actualizo instancia en base de datos a través de su instancia.
                 res.status(204).end()
             } else {
-                res.status(404).json({ error: "NotFound" })
+                res.status(403).end()
             }
         } else {
-            res.status(403).end()
+            res.status(404).json({ error: "NotFound" })
         }
     } catch (error) {
         if (error.name === "SequelizeValidationError") {
@@ -100,15 +104,16 @@ router.put('/:id', authHandler, asyncHandler(async (req, res) => {
 
 router.delete('/:id', authHandler, asyncHandler(async (req, res) => {
     const course = await Course.findByPk(req.params.id)
-    if (course.userId === req.currentUser.id) { //compruebo que solo pueda eliminar sus cursos.
-        if (course) {
+    if (course) {
+        if (course.userId === req.currentUser.id) { //compruebo que solo pueda eliminar sus cursos.
             await course.destroy()
             res.status(204).end()
         } else {
-            res.status(404).json({ error: "NotFound" })
+            res.status(403).end()
         }
-    } else {
-        res.status(403).end()
+    }
+    else {
+        res.status(404).json({ error: "NotFound" })
     }
 }))
 
