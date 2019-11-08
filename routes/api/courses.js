@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const { User, Course } = require('../../models')
+const authHandler = require('../.././auth.js').authenticateUser
 
 /* Handler function to wrap each route. */
 function asyncHandler(cb) {
@@ -53,7 +54,7 @@ router.get('/:id', asyncHandler(async (req, res) => {
 }))
 
 //create course
-router.post('/', asyncHandler(async (req, res, next) => {
+router.post('/', authHandler, asyncHandler(async (req, res, next) => {
     let course;
     try {
         course = await Course.create(req.body)
@@ -75,7 +76,7 @@ router.post('/', asyncHandler(async (req, res, next) => {
 }))
 
 //update course
-router.put('/:id', asyncHandler(async (req, res) => {
+router.put('/:id', authHandler, asyncHandler(async (req, res) => {
     let course;
     try {
         course = await Course.findByPk(req.params.id)
@@ -98,7 +99,7 @@ router.put('/:id', asyncHandler(async (req, res) => {
     }
 }))
 
-router.delete('/:id', asyncHandler(async (req, res) => {
+router.delete('/:id', authHandler, asyncHandler(async (req, res) => {
     const course = await Course.findByPk(req.params.id)
     if (course) {
         await course.destroy()

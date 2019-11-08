@@ -1,4 +1,3 @@
-const express = require('express')
 const auth = require('basic-auth')
 const User = require('./models').User
 const bcryptjs = require('bcryptjs');

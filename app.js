@@ -46,7 +46,11 @@ app.use((err, req, res, next) => {
     console.error(`Global error handler: ${JSON.stringify(err.stack)}`);
   }
 
-  const errorMessage = err.errors.map((error) => error.message)
+  let errorMessage = err.message;
+
+  if (!err.errors == undefined) {
+    errorMessage = err.errors.map((error) => error.message)
+  }
 
   res.status(err.status || 500).json({
     message: errorMessage
