@@ -48,10 +48,11 @@ app.use((err, req, res, next) => {
 
   let errorMessage = err.message;
 
-  if (!err.errors == undefined) {
+  //taking consideration the message when send empty object.
+  if (!(err.errors == undefined) || err.errors) {
     errorMessage = err.errors.map((error) => error.message)
   }
-
+  //console.log(errorMessage)
   res.status(err.status || 500).json({
     message: errorMessage
   });
@@ -65,7 +66,7 @@ app.set('port', process.env.PORT || 5000);
 // start listening on our port
 sequelize.sync().then(() => {
   app.listen(app.get('port'), () => {
-    console.log(`Express server is listening on port 5000`);
+    console.log(`Express server is listening on port ${app.get('port')}`);
   })
 });
 

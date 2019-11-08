@@ -20,8 +20,7 @@ function asyncHandler(cb) {
 
 router.get('/', authHandler, asyncHandler(async (req, res, next) => {
     const user = req.currentUser;
-    console.log(user)
-    res.json({
+    res.status(200).json({
         name: user.firstName,
         email: user.emailAddress
     })
@@ -30,25 +29,22 @@ router.get('/', authHandler, asyncHandler(async (req, res, next) => {
 
 router.post('/', asyncHandler(async (req, res, next) => {
     let user;
-    console.log(req.body)
-    console.log(Object.keys(req.body).length)
+    //controlling if they sent and empty object
     if (Object.keys(req.body).length < 3) {
         throw new Error("Not Enough Parameters");
     }
-
     try {
         const { password } = req.body
-        if (!(password === 'null' || password === "")) {
+        if (!(password === null || password === "")) {
             req.body.password = bcryptjs.hashSync(password)
         }
         user = await User.create(req.body);
-        res.status(201).end()
+        res.status(201).location('/').end()
     } catch (error) {
         if (error.name === "SequelizeValidationError") {
             error.status = 400
             next(error)
         } else {
-            console.log(error)
             throw error;
         }
     }

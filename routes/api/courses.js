@@ -35,7 +35,6 @@ router.get('/', asyncHandler(async (req, res) => {
 
 //get course
 router.get('/:id', asyncHandler(async (req, res) => {
-    console.log(req.params.id)
     const courseId = await Course.findByPk(
         req.params.id, {
         include: {
@@ -58,13 +57,10 @@ router.post('/', authHandler, asyncHandler(async (req, res, next) => {
     let course;
     try {
         course = await Course.create(req.body)
-        console.log(course.toJSON())
         const resCourse = course.toJSON().id
-        res.location(`/api/course/${resCourse}`) //preguntar
-        res.status(201).end()
+        res.status(201).location(`/api/courses/${course.id}`).end()
 
     } catch (error) {
-        //console.log(error)
         if (error.name === "SequelizeValidationError") {
             book = await Course.build(req.body);
             error.status = 400
@@ -79,18 +75,21 @@ router.post('/', authHandler, asyncHandler(async (req, res, next) => {
 router.put('/:id', authHandler, asyncHandler(async (req, res) => {
     let course;
     try {
-        course = await Course.findByPk(req.params.id)
-        console.log(course.toJSON())
-        if (course) {
-            await course.update(req.body) //guardo instancia en base de datos
-            res.status(204).end()
+        course = await Course.findByPk(req.params.id)//busco instancia del curso
+        if (course.userId === req.currentUser.id) {
+            if (course) {
+                await course.update(req.body) //actualizo instancia en base de datos a través de su instancia.
+                res.status(204).end()
+            } else {
+                res.status(404).json({ error: "NotFound" })
+            }
         } else {
-            res.status(404).json({ error: "NotFound" })
+            res.status(403).end()
         }
     } catch (error) {
         if (error.name === "SequelizeValidationError") {
-            course = await Course.build(req.body);
-            console.log(error.errors)
+            //course = await Course.build(req.body);//en este caso no necesito la instancia course, podria 
+            //si por ejemplo tuviera default values en mi model i los quisiera passar.
             error.status = 400
             next(error)
         } else {
@@ -101,11 +100,15 @@ router.put('/:id', authHandler, asyncHandler(async (req, res) => {
 
 router.delete('/:id', authHandler, asyncHandler(async (req, res) => {
     const course = await Course.findByPk(req.params.id)
-    if (course) {
-        await course.destroy()
-        res.status(204).end()
+    if (course.userId === req.currentUser.id) { //compruebo que solo pueda eliminar sus cursos.
+        if (course) {
+            await course.destroy()
+            res.status(204).end()
+        } else {
+            res.status(404).json({ error: "NotFound" })
+        }
     } else {
-        res.status(404).json({ error: "NotFound" })
+        res.status(403).end()
     }
 }))
 

@@ -27,7 +27,9 @@ module.exports = (sequelize) => {
                 notEmpty: {
                     msg: '"email" is required'
                 },
-                isEmail: true,
+                isEmail: {
+                    msg: 'Must be a valid email "name@example.com"'
+                }
             }
         },
         password: {

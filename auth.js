@@ -27,7 +27,6 @@ const authenticateUser = async (req, res, next) => {
                 .compareSync(credentials.pass, password);
             if (authenticated) {
                 console.log(`Authentication successful for username: ${firstName}`);
-                console.log(user.id)
                 currentUser.id = id;
                 currentUser.emailAddress = emailAddress
                 currentUser.firstName = firstName
