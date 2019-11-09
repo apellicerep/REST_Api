@@ -28,19 +28,23 @@ router.get('/', authHandler, asyncHandler(async (req, res, next) => {
 
 router.post('/', asyncHandler(async (req, res, next) => {
     let user;
-    //controlling if they sent and empty object
-    if (Object.keys(req.body).length < 3) {
-        throw new Error("Not Enough Parameters");
+    if (Object.keys(req.body).length == 0) {
+        req.body = { password: "" }
     }
+
     try {
-        const { password } = req.body
-        if (!(password === null || password === "")) {
-            req.body.password = bcryptjs.hashSync(password)
+        if (!(req.body.password === undefined || req.body.password === "")) {
+            req.body.password = bcryptjs.hashSync(req.body.password)
         }
         user = await User.create(req.body);
         res.status(201).location('/').end()
     } catch (error) {
         if (error.name === "SequelizeValidationError") {
+            error.message = error.errors.map(error => error.message)
+            error.status = 400
+            next(error)
+        } else if (error.name === "SequelizeUniqueConstraintError") {
+            error.message = error.errors.map(error => error.message)
             error.status = 400
             next(error)
         } else {

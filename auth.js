@@ -9,24 +9,23 @@ const authenticateUser = async (req, res, next) => {
     let currentUser = {};
     let user;
 
+
     // Get the user's credentials from the Authorization header.
     const credentials = auth(req);
 
-
-    // Look for a user whose `username` matches the credentials `name` property.
-    user = await User.findOne({
-        where: { emailAddress: credentials.name }
-    })
-
-
     if (credentials) {
+
+        // Look for a user whose `username` matches the credentials `name` property.
+        user = await User.findOne({
+            where: { emailAddress: credentials.name }
+        })
 
         if (user) {
             const { id, emailAddress, firstName, password } = user.toJSON()
             const authenticated = bcryptjs
                 .compareSync(credentials.pass, password);
             if (authenticated) {
-                console.log(`Authentication successful for username: ${firstName}`);
+                console.log(`Authentication successful for username: ${credentials.name}`);
                 currentUser.id = id;
                 currentUser.emailAddress = emailAddress
                 currentUser.firstName = firstName
@@ -34,7 +33,7 @@ const authenticateUser = async (req, res, next) => {
                 // Store the user on the Request object.
                 req.currentUser = currentUser; //nos servira para saber quien hace el request.
             } else {
-                message = `Authentication failure for username: ${firstName}`;
+                message = `Wrong password for email: ${credentials.name}`;
             }
         } else {
             message = `User not found with email: ${credentials.name}`;
@@ -45,7 +44,7 @@ const authenticateUser = async (req, res, next) => {
 
     if (message) {
         console.warn(message);
-        res.status(401).json({ message: 'Access Denied' });
+        res.status(401).json({ message: message });
     } else {
         next();
     }

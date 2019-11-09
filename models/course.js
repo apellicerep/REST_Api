@@ -9,36 +9,29 @@ module.exports = (sequelize) => {
             validate: {
                 notEmpty: {
                     msg: '"title" is required'
-                }
-
-            }
+                },
+            },
+            allowNull: false,
+            defaultValue: ''
         },
         description: {
             type: Sequelize.TEXT,
             validate: {
                 notEmpty: {
-                    msg: '"title" is required'
-                }
-            }
+                    msg: '"description" is required'
+                },
+            },
+            allowNull: false,
+            defaultValue: ''
         },
 
         estimatedTime: {
             type: Sequelize.STRING,
             allowNull: true,
-            validate: {
-                notEmpty: {
-                    msg: '"title" is required'
-                }
-            }
         },
         materialsNeeded: {
             type: Sequelize.STRING,
             allowNull: true,
-            validate: {
-                notEmpty: {
-                    msg: '"title" is required'
-                }
-            }
         }
     }, { sequelize });
 

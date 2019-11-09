@@ -41,10 +41,17 @@ router.get('/', asyncHandler(async (req, res) => {
 router.get('/:id', asyncHandler(async (req, res) => {
     const courseId = await Course.findByPk(
         req.params.id, {
-        include: {
-            model: User
-        }
-    })
+        attributes: { exclude: ['createdAt', 'updatedAt'] },
+        include: [
+            {
+                model: User,
+                attributes: {
+                    exclude: ['password', 'createdAt', 'updatedAt']
+                }
+            }
+        ]
+    }
+    )
     if (courseId) {
         res.status(200).json({
             courseId: courseId
@@ -59,14 +66,20 @@ router.get('/:id', asyncHandler(async (req, res) => {
 //create course
 router.post('/', authHandler, asyncHandler(async (req, res, next) => {
     let course;
+
+    if (Object.keys(req.body).length == 0) {
+        req.body = { title: "", description: "", userId: -1 }
+    };
+
+    req.body.userId = req.currentUser.id //add userId from currentUser, we don't need to 
+
     try {
         course = await Course.create(req.body)
-        const resCourse = course.toJSON().id
         res.status(201).location(`/api/courses/${course.id}`).end()
 
     } catch (error) {
         if (error.name === "SequelizeValidationError") {
-            book = await Course.build(req.body);
+            error.message = error.errors.map(error => error.message)
             error.status = 400
             next(error)
         } else {
@@ -76,44 +89,48 @@ router.post('/', authHandler, asyncHandler(async (req, res, next) => {
 }))
 
 //update course
-router.put('/:id', authHandler, asyncHandler(async (req, res) => {
+router.put('/:id', authHandler, asyncHandler(async (req, res, next) => {
     let course;
+    if (Object.keys(req.body).length == 0) {
+        req.body = { title: "", description: "", userId: -1 }
+    };
     try {
-        course = await Course.findByPk(req.params.id)//busco instancia del curso
+        //course = await Course.findByPk(req.params.id)//busco instancia del curso
+        console.log(req.currentUser.id)
+        course = await Course.findOne({
+            where: { userId: req.currentUser.id, id: req.params.id }, //elimino solo el curso que le pertenece
+        })
         if (course) {
-            if (course.userId === req.currentUser.id) {
-                await course.update(req.body) //actualizo instancia en base de datos a través de su instancia.
-                res.status(204).end()
-            } else {
-                res.status(403).end()
-            }
+            await course.update(req.body) //actualizo instancia en base de datos a través de su instancia.
+            res.status(204).end()
+
         } else {
-            res.status(404).json({ error: "NotFound" })
+            res.status(403).end()
         }
     } catch (error) {
         if (error.name === "SequelizeValidationError") {
             //course = await Course.build(req.body);//en este caso no necesito la instancia course, podria 
             //si por ejemplo tuviera default values en mi model i los quisiera passar.
+            error.message = error.errors.map(error => error.message)
             error.status = 400
+            console.log(error.message)
             next(error)
         } else {
+            console.log(error)
             throw error;
         }
     }
 }))
 
 router.delete('/:id', authHandler, asyncHandler(async (req, res) => {
-    const course = await Course.findByPk(req.params.id)
+    const course = await Course.findOne({
+        where: { userId: req.currentUser.id, id: req.params.id }
+    })
     if (course) {
-        if (course.userId === req.currentUser.id) { //compruebo que solo pueda eliminar sus cursos.
-            await course.destroy()
-            res.status(204).end()
-        } else {
-            res.status(403).end()
-        }
-    }
-    else {
-        res.status(404).json({ error: "NotFound" })
+        await course.destroy()
+        res.status(204).end()
+    } else {
+        res.status(403).end()
     }
 }))
 

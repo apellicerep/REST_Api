@@ -9,8 +9,13 @@ module.exports = (sequelize) => {
             validate: {
                 notEmpty: {
                     msg: '"firstName" is required'
+                },
+                notNull: {
+                    msg: 'Missing a "firstName"'
                 }
-            }
+            },
+            allowNull: false,
+            defaultValue: ''
         },
         lastName: {
             type: Sequelize.STRING,
@@ -18,7 +23,9 @@ module.exports = (sequelize) => {
                 notEmpty: {
                     msg: '"lastName" is required'
                 }
-            }
+            },
+            allowNull: false,
+            defaultValue: ''
 
         },
         emailAddress: {
@@ -30,7 +37,10 @@ module.exports = (sequelize) => {
                 isEmail: {
                     msg: 'Must be a valid email "name@example.com"'
                 }
-            }
+            },
+            allowNull: false,
+            unique: true,
+            defaultValue: ''
         },
         password: {
             type: Sequelize.STRING,
@@ -38,7 +48,9 @@ module.exports = (sequelize) => {
                 notEmpty: {
                     msg: '"password" is required'
                 }
-            }
+            },
+            allowNull: false,
+            defaultValue: ''
         }
     }
         , { sequelize });

@@ -10,8 +10,18 @@ var sequelize = require('./models').sequelize;
 const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'true';
 
 // create the Express app
-
 const app = express();
+
+//testing sequelize connection
+sequelize
+  .authenticate()
+  .then(() => {
+    console.log('Connection has been established successfully.');
+  })
+  .catch(err => {
+    console.error('Unable to connect to the database:', err);
+  });
+
 
 //routes
 
@@ -45,15 +55,8 @@ app.use((err, req, res, next) => {
     console.error(`Global error handler: ${JSON.stringify(err.stack)}`);
   }
 
-  let errorMessage = err.message;
-
-  //taking consideration the message when send empty object.
-  if (!(err.errors == undefined) || err.errors) {
-    errorMessage = err.errors.map((error) => error.message)
-  }
-  //console.log(errorMessage)
   res.status(err.status || 500).json({
-    message: errorMessage
+    message: err.message
   });
 });
 

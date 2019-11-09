@@ -98,10 +98,10 @@ class Database {
     await this.context.execute(`
       CREATE TABLE Users (
         id INTEGER PRIMARY KEY AUTOINCREMENT, 
-        firstName VARCHAR(255) NOT NULL, 
-        lastName VARCHAR(255) NOT NULL, 
-        emailAddress VARCHAR(255) NOT NULL UNIQUE, 
-        password VARCHAR(255) NOT NULL, 
+        firstName VARCHAR(255) NOT NULL DEFAULT '', 
+        lastName VARCHAR(255) NOT NULL DEFAULT '', 
+        emailAddress VARCHAR(255) NOT NULL DEFAULT '' UNIQUE, 
+        password VARCHAR(255) NOT NULL DEFAULT '', 
         createdAt DATETIME NOT NULL, 
         updatedAt DATETIME NOT NULL
       );
@@ -130,8 +130,8 @@ class Database {
     await this.context.execute(`
       CREATE TABLE Courses (
         id INTEGER PRIMARY KEY AUTOINCREMENT, 
-        title VARCHAR(255) NOT NULL , 
-        description TEXT NOT NULL , 
+        title VARCHAR(255) NOT NULL DEFAULT '' , 
+        description TEXT NOT NULL DEFAULT '', 
         estimatedTime VARCHAR(255), 
         materialsNeeded VARCHAR(255), 
         createdAt DATETIME NOT NULL, 
