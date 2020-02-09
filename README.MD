@@ -13,3 +13,5 @@ I've used my knowledge of REST API design, Node.js, and Express to create:
 * Postman for testing the REST API.
 
 In a future project, I'll complete a full stack JavaScript application by using React to create a client for this REST API.
+
+![.](https://github.com/apellicerep/REST_Api/blob/master/restApi.png)
